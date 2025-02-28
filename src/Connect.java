@@ -20,7 +20,7 @@ public class Connect {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("Driver Loaded Successfully");
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/news1", "root",
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/login", "root",
                     "Hashan1996@");
             //
             System.out.println("Successful Connection");
@@ -33,13 +33,17 @@ public class Connect {
             System.err.println(sqle);
         }
     }
-    public static void insertItem(String category, String name, String description) {
-        String sql = "INSERT INTO items (category, name, description) VALUES (?, ?, ?)";
+    public static void signup(String user_name, String password) {
+        String sql = "INSERT INTO login (user_name,password) VALUES ( ?, ?)";
+
+
+
 
         try (PreparedStatement pstmt = con.prepareStatement(sql)) {
-            pstmt.setString(1, category);
-            pstmt.setString(2, name);
-            pstmt.setString(3, description);
+
+
+            pstmt.setString(1, user_name);
+            pstmt.setString(2, password);
 
             int rowsInserted = pstmt.executeUpdate();
             if (rowsInserted > 0) {
@@ -50,8 +54,49 @@ public class Connect {
         }
     }
 
-    public static void getItems() {
-        String sql = "SELECT * FROM items";
+    public boolean getItems(String username, String pass) {
+        String sql = "SELECT * FROM login WHERE user_name = ? AND password = ?";
+
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, pass);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                // If we find a match, return true
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+
+        // Return false if no matching user was found
+        return false;
+    }
+    public static void setcontact(String name,String contact) {
+        String sql = "INSERT INTO contact (name,contact) VALUES ( ?, ?)";
+
+
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+
+
+            pstmt.setString(1, name);
+            pstmt.setString(2, contact);
+
+            int rowsInserted = pstmt.executeUpdate();
+            if (rowsInserted > 0) {
+                System.out.println("Item inserted successfully!");
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+    }
+
+
+
+    public static void getcontacts() {
+        String sql = "SELECT * FROM contact";
 
         try (Statement stmt = con.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -59,13 +104,14 @@ public class Connect {
             System.out.println("\nItems in Database:");
             while (rs.next()) {
                 int id = rs.getInt("id");
-                String category = rs.getString("category");
                 String name = rs.getString("name");
-                String description = rs.getString("description");
+                String contact = rs.getString("contact");
 
-                System.out.println("ID: " + id + ", Category: " + category +
-                        ", Name: " + name + ", Description: " + description);
+                System.out.println("ID: " + id + ", : " + name +
+                        ", Name: " + contact);
             }
+
+
 
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
